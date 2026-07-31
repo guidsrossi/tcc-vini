@@ -1,0 +1,27 @@
+# Ambiente virtual local
+.venv/
+venv/
+
+# Cache e arquivos compilados do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs locais
+*.log
+
+# Caches de ferramentas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Cache de dados gerado durante a execucao
+outputs/base_cache.parquet
+
+# Configuracoes locais e segredos
+.env
+.streamlit/secrets.toml
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
