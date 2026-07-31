@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import quote_plus
 
 import pandas as pd
 import streamlit as st
@@ -37,6 +38,7 @@ from src.ui import (
     render_journey,
     render_mini_callout,
     render_result_panel,
+    render_section_heading,
     render_status_bar,
     render_top_nav,
     trend_line_chart,
@@ -159,42 +161,52 @@ def _render_trip_result(df: pd.DataFrame, destination: str, day: str, origin: st
 
     col_gauge, col_tables = st.columns([0.9, 1.1])
     with col_gauge:
-        st.markdown(
-            "<div class='card'><div class='card-header'><div class='card-icon'>◎</div>"
-            "<div class='section-title'>Velocímetro</div></div>",
-            unsafe_allow_html=True,
-        )
-        render_gauge(score, band)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            render_section_heading('◎', 'Nota visual', 'Quanto maior, mais atenção o histórico sugere.')
+            render_gauge(score, band)
 
-        st.markdown(
-            "<div class='card'><div class='card-header'><div class='card-icon'>•</div>"
-            "<div class='section-title'>Por que esse resultado</div></div>",
-            unsafe_allow_html=True,
-        )
-        for reason in explanation['reasons']:
-            render_mini_callout('→', 'Motivo', reason)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            render_section_heading('i', 'Por que esse resultado')
+            for reason in explanation['reasons']:
+                render_mini_callout('→', 'Fator observado', reason)
 
     with col_tables:
-        st.markdown(
-            "<div class='card'><div class='card-header'><div class='card-icon'>◷</div>"
-            "<div class='section-title'>Horários do dia</div></div>",
-            unsafe_allow_html=True,
-        )
-        best_tbl  = explanation['best_table'].rename(columns={'hora': 'Hora', 'acidentes': 'Casos', 'support_level': 'Base', 'score_100': 'Nota', 'faixa': 'Nível', 'driver': 'Motivo'})
-        worst_tbl = explanation['worst_table'].rename(columns={'hora': 'Hora', 'acidentes': 'Casos', 'support_level': 'Base', 'score_100': 'Nota', 'faixa': 'Nível', 'driver': 'Motivo'})
-        tab_best, tab_worst = st.tabs(['Melhores horários', 'Horários para evitar'])
-        with tab_best:
-            st.dataframe(apply_level_style(best_tbl),  use_container_width=True, hide_index=True)
-        with tab_worst:
-            st.dataframe(apply_level_style(worst_tbl), use_container_width=True, hide_index=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            render_section_heading('◷', 'Horários do dia', 'Compare os períodos com registros disponíveis.')
+            best_tbl  = explanation['best_table'].rename(columns={'hora': 'Hora', 'acidentes': 'Casos', 'support_level': 'Base', 'score_100': 'Nota', 'faixa': 'Nível', 'driver': 'Motivo'})
+            worst_tbl = explanation['worst_table'].rename(columns={'hora': 'Hora', 'acidentes': 'Casos', 'support_level': 'Base', 'score_100': 'Nota', 'faixa': 'Nível', 'driver': 'Motivo'})
+            tab_best, tab_worst = st.tabs(['Melhores horários', 'Horários para evitar'])
+            with tab_best:
+                st.dataframe(apply_level_style(best_tbl), use_container_width=True, hide_index=True)
+            with tab_worst:
+                st.dataframe(apply_level_style(worst_tbl), use_container_width=True, hide_index=True)
 
     if origin and label:
-        st.link_button('Abrir rota no Google Maps', build_maps_link(origin, str(label)), use_container_width=True)
+        render_route_map(origin, str(label))
     elif label:
         render_mini_callout('→', 'Rota no Maps', 'Digite a origem para abrir a rota no Google Maps.')
+
+
+def render_route_map(origin: str, destination: str) -> None:
+    """Embed a directions map while preserving a link to the full Maps experience."""
+    origin_query = quote_plus(origin.strip())
+    destination_query = quote_plus(f'{destination}, Brasil')
+    embed_url = (
+        'https://maps.google.com/maps?'
+        f'saddr={origin_query}&daddr={destination_query}&output=embed'
+    )
+    with st.container(border=True):
+        render_section_heading(
+            '⌖',
+            'Mapa da rota',
+            f'Prévia de {origin.strip()} até {destination}. Confira trânsito e bloqueios antes de sair.',
+        )
+        st.iframe(embed_url, height=460, scrolling=False)
+        st.link_button(
+            'Abrir rota completa no Google Maps',
+            build_maps_link(origin, destination),
+            width='stretch',
+        )
 
 
 def page_plan_trip(df: pd.DataFrame, source: str) -> None:
@@ -620,6 +632,99 @@ def page_about(df: pd.DataFrame) -> None:
         st.markdown('</div>', unsafe_allow_html=True)
 
 
+def page_about_accessible(df: pd.DataFrame) -> None:
+    """Explain the project in plain language, with technical details on demand."""
+    st.markdown("<h3>Entenda o Radar</h3>", unsafe_allow_html=True)
+    st.caption('Uma explicação simples sobre o que o sistema mostra — e o que ele não consegue prever.')
+
+    with st.container(border=True):
+        render_section_heading('◎', 'O que este sistema faz')
+        st.markdown(
+            """
+            O Radar analisa **acidentes que já aconteceram** e procura padrões de horário,
+            local e gravidade. Quando você informa um destino, ele compara esses padrões e
+            sugere períodos que historicamente tiveram resultados melhores ou piores.
+            """
+        )
+        st.info(
+            'A nota é uma referência histórica, não uma previsão. Use também um aplicativo '
+            'de trânsito atualizado, confira o clima e respeite a sinalização da via.',
+            icon='ℹ️',
+        )
+
+    st.markdown("<h3>Como ler o resultado</h3>", unsafe_allow_html=True)
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        with st.container(border=True):
+            render_section_heading('1', 'Nota de atenção')
+            st.markdown('Vai de **0 a 100**. Quanto maior, mais sinais históricos pedem cuidado.')
+    with c2:
+        with st.container(border=True):
+            render_section_heading('2', 'Nível')
+            st.markdown('Traduz a nota em **Baixa, Moderada, Elevada ou Alta** para facilitar a leitura.')
+    with c3:
+        with st.container(border=True):
+            render_section_heading('3', 'Confiança')
+            st.markdown('Indica a quantidade de dados por trás da resposta. Mais registros dão uma referência mais estável.')
+
+    with st.container(border=True):
+        render_section_heading('✓', 'O que entra no cálculo')
+        a, b = st.columns(2)
+        with a:
+            st.markdown(
+                """
+                - quantidade de acidentes registrados;
+                - mortos e feridos graves;
+                - horário e dia da semana;
+                - clima informado no registro.
+                """
+            )
+        with b:
+            st.markdown(
+                """
+                - município e rodovia;
+                - causa e tipo do acidente;
+                - tipo e traçado da pista;
+                - quantidade de dados disponíveis.
+                """
+            )
+
+    validation = get_validation()
+    with st.container(border=True):
+        render_section_heading('▣', 'Dados disponíveis', 'Resumo das informações carregadas nesta consulta.')
+        m1, m2, m3 = st.columns(3)
+        m1.metric('Acidentes analisados', human_int(validation['rows']))
+        m2.metric('Estados na base nacional', str(validation['national_uf_count']))
+        m3.metric('Verificação dos dados', 'Tudo certo' if validation['ok'] else 'Revisão necessária')
+        counts = df['fonte_base'].value_counts().rename_axis('Fonte').reset_index(name='Registros')
+        st.dataframe(counts, use_container_width=True, hide_index=True)
+
+    with st.expander('Ver detalhes técnicos do modelo'):
+        metrics = read_metrics()
+        if not metrics:
+            st.write('As métricas técnicas ainda não estão disponíveis.')
+        else:
+            st.markdown(
+                'Esta parte é voltada a estudantes e avaliadores. Ela mostra como o modelo '
+                'se comportou em dados separados para teste.'
+            )
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric('Acertos gerais', f"{metrics['accuracy']:.1%}")
+            m2.metric('Casos graves encontrados', f"{metrics['recall']:.1%}")
+            m3.metric('Precisão dos alertas', f"{metrics['precision']:.1%}")
+            m4.metric('Equilíbrio F1', f"{metrics['f1_score']:.1%}")
+            st.caption(
+                'O modelo prioriza encontrar mais casos graves. Por isso, ele pode emitir '
+                'mais alertas que depois não se confirmam como graves.'
+            )
+
+    st.warning(
+        'Não use o Radar como única fonte para decidir uma viagem. Ele não recebe trânsito, '
+        'obras, bloqueios ou clima em tempo real.',
+        icon='⚠️',
+    )
+
+
 def main() -> None:
     st.set_page_config(page_title='Radar de Viagem Segura', page_icon='🧭', layout='wide')
     inject_css()
@@ -650,7 +755,7 @@ def main() -> None:
         'Melhores horários':        page_best_hours,
         'Mapa histórico':           page_map,
         'Tabela':                   page_table,
-        'Sobre':                    page_about,
+        'Sobre':                    page_about_accessible,
     }
     page_map_fn[page](filtered)
 

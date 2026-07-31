@@ -108,6 +108,18 @@ html, body, [class*="css"] {
     display:flex; align-items:center; justify-content:space-between;
     gap:1rem; flex-wrap:wrap; margin-bottom:1.3rem;
 }
+.hero-eyebrow {
+    display:inline-flex; align-items:center; gap:.5rem;
+    color:var(--accent-2); font-size:.73rem; font-weight:800;
+    letter-spacing:.09em; text-transform:uppercase;
+}
+.hero-eyebrow::before { content:''; width:18px; height:2px; border-radius:99px; background:var(--accent); }
+.hero-meta {
+    display:flex; align-items:center; gap:.7rem; flex-wrap:wrap;
+    color:var(--muted); font-size:.76rem; font-weight:650;
+}
+.hero-meta span { display:inline-flex; align-items:center; gap:.35rem; }
+.hero-meta span::before { content:'•'; color:var(--accent); }
 .pill {
     display:inline-flex; align-items:center; gap:.45rem;
     padding:.3rem .75rem; border-radius:999px;
@@ -169,6 +181,28 @@ html, body, [class*="css"] {
     animation: fadeUp .45s ease-out;
 }
 div[role="radiogroup"] { gap:.3rem !important; }
+div[data-testid="stRadio"] > label { display:none !important; }
+div[data-testid="stRadio"] {
+    position:sticky; top:.65rem; z-index:30;
+    padding:.42rem .48rem; border-radius:14px;
+    border:1px solid rgba(148,163,184,.10);
+    background:rgba(5,7,9,.91); backdrop-filter:blur(18px);
+    box-shadow:0 10px 30px rgba(0,0,0,.42);
+}
+div[data-testid="stRadio"] div[role="radiogroup"] { gap:.35rem !important; flex-wrap:wrap; }
+div[data-testid="stRadio"] div[role="radiogroup"] label {
+    padding:.58rem .85rem !important; border:1px solid transparent !important;
+    border-radius:10px !important; background:transparent !important;
+    cursor:pointer !important; transition:background .15s,border-color .15s,color .15s !important;
+}
+div[data-testid="stRadio"] div[role="radiogroup"] label > div:first-child { display:none !important; }
+div[data-testid="stRadio"] div[role="radiogroup"] label p {
+    color:var(--muted) !important; font-size:.84rem !important; font-weight:750 !important;
+}
+div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) {
+    background:rgba(59,130,246,.14) !important; border-color:rgba(59,130,246,.26) !important;
+}
+div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) p { color:var(--accent-2) !important; }
 div[role="radiogroup"] label[data-baseweb="radio"] {
     border-radius:var(--r-sm) !important; padding:.46rem .82rem !important;
     border:1px solid transparent !important; background:transparent !important;
@@ -358,6 +392,15 @@ div[role="radiogroup"] label[data-baseweb="radio"]:hover {
     font-size:.76rem !important; font-weight:700 !important;
     text-transform:uppercase; letter-spacing:.07em; color:var(--muted) !important;
 }
+/* Cabeçalhos HTML não tentam imitar contêineres interativos. Conteúdo dinâmico
+   usa st.container(border=True), que mantém título e componente no mesmo bloco. */
+.card:not(:has(.journey-grid)) {
+    background:transparent; border:0; border-radius:0; box-shadow:none;
+    padding:.25rem 0 0; margin:0;
+}
+.card:not(:has(.journey-grid)) .card-header {
+    border-bottom:0; padding-bottom:.2rem; margin-bottom:.25rem;
+}
 [data-testid="stWidgetLabel"] { margin-bottom:.35rem; }
 [data-baseweb="select"] > div,
 .stMultiSelect div[data-baseweb="select"] > div,
@@ -458,7 +501,7 @@ h3::before {
     width: 1.1rem; height: 1.1rem; border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.12);
     color: var(--muted); font-size: .62rem; font-weight: 800;
-    cursor: default; margin-left: .35rem; vertical-align: middle;
+    cursor: help; margin-left: .35rem; vertical-align: middle;
     transition: border-color .15s, color .15s;
 }
 .kpi-tooltip-icon:hover { border-color: var(--accent); color: var(--accent-2); }
@@ -568,6 +611,10 @@ hr { border-color: rgba(255,255,255,0.05) !important; }
 }
 .filter-heading-title { color:var(--text); font-size:.98rem; font-weight:850; }
 .filter-heading-copy { color:var(--muted); font-size:.78rem; margin-top:.12rem; }
+.section-heading { display:flex; align-items:center; gap:.75rem; padding:.05rem 0 .9rem; }
+.section-heading .card-icon { width:2.15rem; height:2.15rem; }
+.section-heading .section-title { margin:0; }
+.section-heading .section-copy { margin:.18rem 0 0; }
 [data-testid="stPlotlyChart"] { border-radius:12px; overflow:hidden; }
 [data-testid="stDataFrame"] { min-height:260px; }
 [data-testid="stDeckGlJsonChart"] { border:1px solid var(--border); border-radius:16px; overflow:hidden; }
@@ -621,16 +668,10 @@ def render_header() -> None:
         f"""
         <div class='hero'>
             <div class='hero-topline'>
-                <span class='pill'><span class='pill-dot'></span>ao vivo</span>
-                <div class='hero-kpis'>
-                    <div class='hero-kpi'>
-                        <span class='hero-kpi-label'>Bases disponíveis</span>
-                        <span class='hero-kpi-value'>3 opções</span>
-                    </div>
-                    <div class='hero-kpi'>
-                        <span class='hero-kpi-label'>Fluxo</span>
-                        <span class='hero-kpi-value'>Escolha → Veja → Viaje</span>
-                    </div>
+                <span class='hero-eyebrow'>Análise de segurança viária</span>
+                <div class='hero-meta'>
+                    <span>Brasil e São Paulo</span>
+                    <span>Dados de 2025 e 2026</span>
                 </div>
             </div>
             <h1><em>{APP_TITLE}</em></h1>
@@ -641,11 +682,23 @@ def render_header() -> None:
     )
 
 
+def render_section_heading(icon: str, title: str, copy: str | None = None) -> None:
+    copy_html = f"<div class='section-copy'>{copy}</div>" if copy else ''
+    st.markdown(
+        f"""
+        <div class='section-heading'>
+            <div class='card-icon'>{icon}</div>
+            <div><div class='section-title'>{title}</div>{copy_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def render_top_nav() -> str:
     labels = [name for name, _ in PAGES]
     if 'page' not in st.session_state:
         st.session_state.page = 'Planejar viagem'
-    st.markdown("<div class='nav-wrap'>", unsafe_allow_html=True)
     page = st.radio(
         'Navegação',
         labels,
@@ -654,7 +707,6 @@ def render_top_nav() -> str:
         label_visibility='collapsed',
         key='top_nav_radio',
     )
-    st.markdown('</div>', unsafe_allow_html=True)
     st.session_state.page = page
     return page
 
