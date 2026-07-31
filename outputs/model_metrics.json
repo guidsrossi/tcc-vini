@@ -1,0 +1,41 @@
+{
+  "accuracy": 0.5827190827190827,
+  "precision": 0.3558139534883721,
+  "recall": 0.7094281298299846,
+  "f1_score": 0.47392875580795046,
+  "threshold": 0.5800000000000003,
+  "samples": 49999,
+  "positive_rate": 0.2001240024800496,
+  "confusion_matrix": [
+    [
+      964,
+      831
+    ],
+    [
+      188,
+      459
+    ]
+  ],
+  "classification_report": "              precision    recall  f1-score   support\n\n           0       0.84      0.54      0.65      1795\n           1       0.36      0.71      0.47       647\n\n    accuracy                           0.58      2442\n   macro avg       0.60      0.62      0.56      2442\nweighted avg       0.71      0.58      0.61      2442\n",
+  "mode": "holdout_temporal",
+  "train_years": [
+    2025
+  ],
+  "test_year": 2026,
+  "features": [
+    "uf",
+    "hora",
+    "dia_semana",
+    "municipio",
+    "rodovia",
+    "causa_acidente",
+    "tipo_acidente",
+    "condicao_metereologica",
+    "tipo_pista",
+    "tracado_via",
+    "fonte_base",
+    "month",
+    "is_weekend",
+    "periodo_dia"
+  ]
+}
