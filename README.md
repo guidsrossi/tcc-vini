@@ -6,10 +6,18 @@ Dashboard desenvolvido em Python e Streamlit para explorar dados históricos de 
 
 ## Documentação
 
-[![Baixar documentação completa](https://img.shields.io/badge/Baixar-Documentação_completa-2563EB?style=for-the-badge&logo=markdown&logoColor=white)](./docs/DOCUMENTACAO_COMPLETA.md?raw=1)
+[![Baixar documentação em Word](https://img.shields.io/badge/Baixar-Documentação_Word-2563EB?style=for-the-badge&logo=microsoftword&logoColor=white)](./docs/DOCUMENTACAO_COMPLETA_RADAR_VIAGEM_SEGURA.docx?raw=1)
 
+- [Baixar a documentação completa em Word (.docx)](./docs/DOCUMENTACAO_COMPLETA_RADAR_VIAGEM_SEGURA.docx?raw=1)
 - [Ler a documentação completa no GitHub](./docs/DOCUMENTACAO_COMPLETA.md)
-- [Baixar a documentação completa](./docs/DOCUMENTACAO_COMPLETA.md?raw=1)
+- [Baixar a versão em Markdown](./docs/DOCUMENTACAO_COMPLETA.md?raw=1)
+
+Para regenerar o arquivo Word após uma atualização da documentação:
+
+```powershell
+python -m pip install -r requirements-docs.txt
+python scripts/gerar_documentacao_word.py
+```
 
 ## Funcionalidades
 
@@ -58,4 +66,3 @@ docs/                   Documentação do projeto
 ```
 
 Consulte a [documentação completa](./docs/DOCUMENTACAO_COMPLETA.md) para instalação detalhada, arquitetura, dados, metodologia, operação e solução de problemas.
-
