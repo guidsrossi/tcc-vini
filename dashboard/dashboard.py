@@ -630,15 +630,9 @@ def main() -> None:
         base = get_base()
 
     years = sorted([int(y) for y in base['ano_referencia'].dropna().unique().tolist()])
-    source, selected_years = render_filters(SOURCE_OPTIONS, years)
-
-    ufs_for_source = available_ufs(base, source)
-    selected_ufs   = st.multiselect(
-        'Estados',
-        ufs_for_source,
-        default=st.session_state.get('_ufs', []),
-        key='_ufs',
-        placeholder='Todos os estados',
+    ufs_by_source = {option: available_ufs(base, option) for option in SOURCE_OPTIONS}
+    source, selected_years, selected_ufs, ufs_for_source = render_filters(
+        SOURCE_OPTIONS, years, ufs_by_source
     )
 
     filtered = get_filtered(source, tuple(selected_years), tuple(selected_ufs))

@@ -63,10 +63,13 @@ html, body, [class*="css"] {
 #MainMenu, footer, header { visibility: hidden; }
 
 .block-container {
-    max-width: 1300px;
-    padding-top: .9rem;
-    padding-bottom: 3rem;
+    max-width: 1240px;
+    padding: 1.25rem 2rem 4.5rem;
 }
+
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] { gap: 1.15rem; }
+[data-testid="stHorizontalBlock"] { gap: 1rem; }
+[data-testid="column"] > [data-testid="stVerticalBlock"] { gap: .85rem; }
 
 /* ── SCROLLBAR ─────────────────────────────────────────────── */
 ::-webkit-scrollbar              { width:5px; height:5px; }
@@ -78,12 +81,12 @@ html, body, [class*="css"] {
 .hero {
     position: relative;
     overflow: hidden;
-    padding: 2.4rem 2.2rem 2rem;
-    border-radius: 20px;
+    padding: 2.15rem 2.25rem 1.9rem;
+    border-radius: 24px;
     border: 1px solid rgba(59,130,246,0.16);
     background: linear-gradient(135deg, #0B1120 0%, #090D18 100%);
     box-shadow: 0 0 0 1px rgba(255,255,255,0.03), var(--shadow);
-    margin-bottom: 1.25rem;
+    margin-bottom: .35rem;
     animation: fadeUp .55s cubic-bezier(.22,.68,0,1.2);
     isolation: isolate;
 }
@@ -132,19 +135,19 @@ html, body, [class*="css"] {
 .hero-kpi-value { font-size:.92rem; font-weight:700; color:var(--text); }
 
 .hero h1 {
-    margin:0 0 .6rem; font-size:2.75rem; font-weight:900;
-    line-height:1.0; letter-spacing:-.06em; color:#FFFFFF; max-width:16ch;
+    margin:0 0 .7rem; font-size:clamp(2.25rem, 4.2vw, 3.25rem); font-weight:900;
+    line-height:1.02; letter-spacing:-.055em; color:#FFFFFF; max-width:18ch;
 }
 .hero h1 em { font-style:normal; color:var(--accent-2); }
-.hero-sub { color:var(--muted); font-size:.93rem; line-height:1.68; max-width:680px; }
+.hero-sub { color:#91A1B8; font-size:.96rem; line-height:1.7; max-width:760px; }
 
 /* ── STATUS BAR ────────────────────────────────────────────── */
 .status-bar {
     display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
-    padding:.55rem .9rem; border-radius:var(--r-sm);
+    padding:.7rem 1rem; border-radius:12px;
     border:1px solid var(--border);
     background: rgba(255,255,255,0.025);
-    margin-bottom:.9rem;
+    margin:0 0 .4rem;
     animation: fadeIn .4s ease;
 }
 .status-chip {
@@ -157,7 +160,7 @@ html, body, [class*="css"] {
 /* ── NAV ───────────────────────────────────────────────────── */
 .nav-wrap {
     position:sticky; top:.5rem; z-index:30;
-    padding:.4rem .45rem; margin:0 0 1.1rem;
+    padding:.45rem .5rem; margin:0 0 .15rem;
     border-radius:var(--r);
     border:1px solid rgba(255,255,255,0.05);
     background: rgba(5,7,9,0.88);
@@ -188,12 +191,12 @@ div[role="radiogroup"] label[data-baseweb="radio"]:hover {
 
 /* ── CARDS ─────────────────────────────────────────────────── */
 .panel, .card {
-    background: var(--surface);
-    border:1px solid var(--border);
-    border-radius:var(--r);
-    box-shadow: var(--shadow-card);
-    padding:1.25rem 1.3rem;
-    margin-bottom:1rem;
+    background: linear-gradient(145deg, rgba(13,18,29,.98), rgba(9,13,22,.98));
+    border:1px solid rgba(148,163,184,.11);
+    border-radius:18px;
+    box-shadow: 0 14px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.025);
+    padding:1.4rem 1.45rem;
+    margin-bottom:.45rem;
     animation: fadeUp .5s ease-out;
 }
 .card-header {
@@ -224,12 +227,12 @@ div[role="radiogroup"] label[data-baseweb="radio"]:hover {
 
 .kpi {
     position:relative; overflow:hidden;
-    padding:1.15rem 1.1rem 1.05rem;
-    min-height:115px;
+    padding:1.25rem 1.2rem 1.15rem;
+    min-height:122px;
     background: var(--surface);
     border:1px solid var(--border);
     border-radius:var(--r);
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 12px 34px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.025);
     transition: transform .18s, border-color .18s, box-shadow .18s;
     animation: fadeUp .5s ease-out;
 }
@@ -339,7 +342,7 @@ div[role="radiogroup"] label[data-baseweb="radio"]:hover {
     padding:.9rem 1rem; border-radius:var(--r-sm);
     border:1px solid var(--border);
     background: rgba(255,255,255,0.02);
-    margin-bottom:.65rem;
+    margin-bottom:.25rem;
     animation: fadeIn .4s ease;
 }
 .mini-callout-icon {
@@ -355,6 +358,7 @@ div[role="radiogroup"] label[data-baseweb="radio"]:hover {
     font-size:.76rem !important; font-weight:700 !important;
     text-transform:uppercase; letter-spacing:.07em; color:var(--muted) !important;
 }
+[data-testid="stWidgetLabel"] { margin-bottom:.35rem; }
 [data-baseweb="select"] > div,
 .stMultiSelect div[data-baseweb="select"] > div,
 .stTextInput input {
@@ -435,8 +439,13 @@ div[data-testid="stDataFrame"] {
 
 /* ── TYPOGRAPHY ────────────────────────────────────────────── */
 h3 {
-    font-size:1.25rem; font-weight:900; letter-spacing:-.03em;
-    color:#FFFFFF; margin-bottom:.3rem;
+    position:relative; font-size:1.45rem; font-weight:900; letter-spacing:-.035em;
+    line-height:1.2; color:#FFFFFF; margin:.35rem 0 .15rem; padding-left:.85rem;
+}
+h3::before {
+    content:''; position:absolute; left:0; top:.12rem; bottom:.12rem; width:3px;
+    border-radius:99px; background:linear-gradient(180deg,var(--accent-2),var(--accent));
+    box-shadow:0 0 16px rgba(59,130,246,.45);
 }
 [data-testid="stCaptionContainer"] p { color:var(--muted); font-size:.8rem; }
 [data-testid="stMetric"]              { background:transparent; }
@@ -544,6 +553,25 @@ h3 {
 /* ── DIVIDER ───────────────────────────────────────────────── */
 hr { border-color: rgba(255,255,255,0.05) !important; }
 
+[data-testid="stVerticalBlockBorderWrapper"] {
+    border:1px solid rgba(148,163,184,.12) !important;
+    border-radius:18px !important;
+    background:linear-gradient(145deg,rgba(13,18,29,.96),rgba(9,13,22,.96)) !important;
+    box-shadow:0 14px 42px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.025);
+}
+[data-testid="stVerticalBlockBorderWrapper"] > div { padding:1.2rem 1.3rem 1.25rem !important; }
+.filter-heading { display:flex; align-items:center; gap:.7rem; margin:0 0 .15rem; }
+.filter-heading-icon {
+    display:grid; place-items:center; width:2rem; height:2rem; border-radius:9px;
+    color:var(--accent-2); background:var(--accent-soft);
+    border:1px solid rgba(59,130,246,.22); font-size:.82rem; font-weight:900;
+}
+.filter-heading-title { color:var(--text); font-size:.98rem; font-weight:850; }
+.filter-heading-copy { color:var(--muted); font-size:.78rem; margin-top:.12rem; }
+[data-testid="stPlotlyChart"] { border-radius:12px; overflow:hidden; }
+[data-testid="stDataFrame"] { min-height:260px; }
+[data-testid="stDeckGlJsonChart"] { border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+
 /* ── RESPONSIVE ────────────────────────────────────────────── */
 @media (max-width:980px) {
     .kpi-grid   { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -553,6 +581,13 @@ hr { border-color: rgba(255,255,255,0.05) !important; }
     .journey-grid, .kpi-grid { grid-template-columns:1fr; }
     .hero h1  { font-size:2.1rem; }
     .hero     { padding:1.5rem 1.15rem 1.3rem; }
+    .block-container { padding:1rem .9rem 3rem; }
+    [data-testid="stHorizontalBlock"] { gap:.65rem; }
+    .hero-kpi { min-width:0; flex:1 1 140px; }
+    .nav-wrap { position:relative; top:0; overflow-x:auto; }
+    div[role="radiogroup"] { flex-wrap:nowrap !important; min-width:max-content; }
+    .panel, .card { padding:1.1rem; border-radius:15px; }
+    [data-testid="stVerticalBlockBorderWrapper"] > div { padding:1rem !important; }
 }
 </style>
 """
@@ -725,7 +760,7 @@ def render_gauge(score: int, band: str) -> None:
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
 
-def render_filters(source_options: list[str], years: list[int]):
+def _render_filters_legacy(source_options: list[str], years: list[int]):
     st.markdown(
         """
         <div class='panel'>
@@ -748,6 +783,53 @@ def render_filters(source_options: list[str], years: list[int]):
     year_sel = c2.multiselect('Anos', years, default=st.session_state.get('_years', []), placeholder='Todos os anos', key='_years')
     st.markdown('</div>', unsafe_allow_html=True)
     return source, year_sel
+
+
+def render_filters(
+    source_options: list[str],
+    years: list[int],
+    ufs_by_source: dict[str, list[str]],
+):
+    """Render all global filters in one cohesive, responsive panel."""
+    with st.container(border=True):
+        st.markdown(
+            """
+            <div class='filter-heading'>
+                <div class='filter-heading-icon'>⌁</div>
+                <div>
+                    <div class='filter-heading-title'>Refine sua consulta</div>
+                    <div class='filter-heading-copy'>Combine base, período e estados para atualizar todo o painel.</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        c1, c2, c3 = st.columns([1.0, 1.25, 1.45], gap='medium')
+        source = c1.selectbox(
+            'Base de dados',
+            source_options,
+            index=source_options.index(st.session_state.get('_source', source_options[0])),
+            key='_source',
+        )
+        selected_years = c2.multiselect(
+            'Anos',
+            years,
+            default=st.session_state.get('_years', []),
+            placeholder='Todos os anos',
+            key='_years',
+        )
+        available_ufs = ufs_by_source.get(source, [])
+        previous_ufs = [uf for uf in st.session_state.get('_ufs', []) if uf in available_ufs]
+        if previous_ufs != st.session_state.get('_ufs', []):
+            st.session_state['_ufs'] = previous_ufs
+        selected_ufs = c3.multiselect(
+            'Estados',
+            available_ufs,
+            default=previous_ufs,
+            key='_ufs',
+            placeholder='Todos os estados',
+        )
+    return source, selected_years, selected_ufs, available_ufs
 
 
 def render_journey() -> None:
