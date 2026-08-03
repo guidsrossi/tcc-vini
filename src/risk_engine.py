@@ -322,19 +322,27 @@ def best_and_worst_hours(df: pd.DataFrame, day_name: str | None = None) -> dict:
     usable = ref[ref['observed']].copy()
     if usable.empty:
         return {'best_window': [], 'worst_hours': [], 'best_hour': None, 'worst_hour': None}
+    # Uma única hora observada não permite comparar horários. Marcá-la como a
+    # melhor e a pior ao mesmo tempo produz uma recomendação contraditória.
+    if len(usable) < 2:
+        return {'best_window': [], 'worst_hours': [], 'best_hour': None, 'worst_hour': None}
 
     usable_sorted_asc  = usable.sort_values(['score_cautela', 'support_ratio', 'hora'], ascending=[True, False, True])
     usable_sorted_desc = usable.sort_values(['score_cautela', 'support_ratio', 'hora'], ascending=[False, False, True])
 
     best_raw   = usable_sorted_asc.head(6)['hora'].astype(int).tolist()
-    worst_raw  = usable_sorted_desc.head(3)['hora'].astype(int).tolist()
-
     # Try to find a consecutive window of 2 best hours
     score_map  = dict(zip(usable['hora'].astype(int), usable['score_cautela']))
-    best_window = _best_consecutive_window(score_map, window=2) or best_raw[:2]
+    best_window = _best_consecutive_window(score_map, window=2) if len(usable) >= 3 else None
+    best_window = best_window or best_raw[:1]
+    best_set = set(best_window)
+    worst_raw = [
+        int(hour) for hour in usable_sorted_desc['hora'].tolist()
+        if int(hour) not in best_set
+    ][:3]
 
     return {
-        'best_window': best_window or best_raw[:2],
+        'best_window': best_window,
         'worst_hours': worst_raw,
         'best_hour':   best_window[0] if best_window else None,
         'worst_hour':  worst_raw[0]   if worst_raw   else None,
@@ -523,6 +531,8 @@ def destination_snapshot(df: pd.DataFrame, day_name: str) -> dict[str, object]:
     behavioral_rate = float(_safe_numeric(df, 'is_behavioral_cause').mean())
     top_causes      = _top_value(_safe_text(df, 'causa_acidente').replace({'': None, 'nan': None}).dropna(), n=2)
     top_cause       = top_causes[0] if top_causes else None
+    if top_cause:
+        top_cause = str(top_cause).replace('Rea��o', 'Reação').replace('rea��o', 'reação')
 
     # Build reasons
     reasons: list[str] = []
@@ -606,6 +616,7 @@ def explain_trip(df: pd.DataFrame, day_name: str, destination_label: str | None)
         'confidence': snap['confidence'], 'reasons': snap['reasons'],
         'best_table': snap['best_table'], 'worst_table': snap['worst_table'],
         'records': snap['records'], 'observed_hours': snap['observed_hours'],
+        'serious_rate': snap['serious_rate'],
     }
 
 

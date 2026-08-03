@@ -81,7 +81,7 @@ html, body, [class*="css"] {
 .hero {
     position: relative;
     overflow: hidden;
-    padding: 2.15rem 2.25rem 1.9rem;
+    padding: 1.35rem 1.6rem 1.25rem;
     border-radius: 24px;
     border: 1px solid rgba(59,130,246,0.16);
     background: linear-gradient(135deg, #0B1120 0%, #090D18 100%);
@@ -106,7 +106,7 @@ html, body, [class*="css"] {
 }
 .hero-topline {
     display:flex; align-items:center; justify-content:space-between;
-    gap:1rem; flex-wrap:wrap; margin-bottom:1.3rem;
+    gap:1rem; flex-wrap:wrap; margin-bottom:.75rem;
 }
 .hero-eyebrow {
     display:inline-flex; align-items:center; gap:.5rem;
@@ -147,11 +147,11 @@ html, body, [class*="css"] {
 .hero-kpi-value { font-size:.92rem; font-weight:700; color:var(--text); }
 
 .hero h1 {
-    margin:0 0 .7rem; font-size:clamp(2.25rem, 4.2vw, 3.25rem); font-weight:900;
+    margin:0 0 .4rem; font-size:clamp(1.75rem, 3vw, 2.35rem); font-weight:900;
     line-height:1.02; letter-spacing:-.055em; color:#FFFFFF; max-width:18ch;
 }
 .hero h1 em { font-style:normal; color:var(--accent-2); }
-.hero-sub { color:#91A1B8; font-size:.96rem; line-height:1.7; max-width:760px; }
+.hero-sub { color:#91A1B8; font-size:.88rem; line-height:1.55; max-width:880px; }
 
 /* ── STATUS BAR ────────────────────────────────────────────── */
 .status-bar {
@@ -372,18 +372,17 @@ div[role="radiogroup"] label[data-baseweb="radio"]:hover {
 
 /* ── MINI CALLOUT ──────────────────────────────────────────── */
 .mini-callout {
-    display:flex; gap:.9rem; align-items:flex-start;
-    padding:.9rem 1rem; border-radius:var(--r-sm);
-    border:1px solid var(--border);
-    background: rgba(255,255,255,0.02);
-    margin-bottom:.25rem;
+    display:flex; gap:.65rem; align-items:flex-start;
+    padding:.55rem 0 .55rem .25rem;
+    border:0; border-left:2px solid rgba(59,130,246,.3);
+    background:transparent; margin:0 0 .2rem;
     animation: fadeIn .4s ease;
 }
 .mini-callout-icon {
-    flex:0 0 auto; width:1.85rem; height:1.85rem; border-radius:var(--r-xs);
+    flex:0 0 auto; width:1.5rem; height:1.5rem;
     display:flex; align-items:center; justify-content:center;
-    background: rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.20);
-    color:#60A5FA; font-weight:900; font-size:.78rem;
+    background:transparent; border:0;
+    color:#60A5FA; font-weight:900; font-size:.82rem;
 }
 .mini-callout-title { font-weight:800; font-size:.88rem; margin-bottom:.18rem; color:var(--text); }
 
@@ -605,19 +604,67 @@ hr { border-color: rgba(255,255,255,0.05) !important; }
 [data-testid="stVerticalBlockBorderWrapper"] > div { padding:1.2rem 1.3rem 1.25rem !important; }
 .filter-heading { display:flex; align-items:center; gap:.7rem; margin:0 0 .15rem; }
 .filter-heading-icon {
-    display:grid; place-items:center; width:2rem; height:2rem; border-radius:9px;
-    color:var(--accent-2); background:var(--accent-soft);
-    border:1px solid rgba(59,130,246,.22); font-size:.82rem; font-weight:900;
+    display:grid; place-items:center; width:1.4rem; height:1.4rem;
+    color:var(--accent-2); background:transparent;
+    border:0; font-size:.88rem; font-weight:900;
 }
 .filter-heading-title { color:var(--text); font-size:.98rem; font-weight:850; }
 .filter-heading-copy { color:var(--muted); font-size:.78rem; margin-top:.12rem; }
 .section-heading { display:flex; align-items:center; gap:.75rem; padding:.05rem 0 .9rem; }
-.section-heading .card-icon { width:2.15rem; height:2.15rem; }
+.section-heading .card-icon {
+    width:1.5rem; height:1.5rem; border:0; border-radius:0;
+    background:transparent; font-size:.88rem;
+}
+.stButton > button[kind="secondary"], .stDownloadButton > button {
+    background:rgba(255,255,255,.035) !important;
+    color:var(--text) !important;
+    border:1px solid rgba(148,163,184,.16) !important;
+    box-shadow:none !important;
+}
+.stButton > button[kind="secondary"]:hover, .stDownloadButton > button:hover {
+    background:rgba(59,130,246,.08) !important;
+    border-color:rgba(59,130,246,.3) !important;
+    transform:none !important; box-shadow:none !important;
+}
+/* Navegação: alvos grandes, texto legível e aparência claramente clicável. */
+[class*="st-key-nav_"] button {
+    min-height:58px !important; justify-content:flex-start !important;
+    padding:.75rem 1rem !important; font-size:.96rem !important;
+    text-align:left !important;
+}
+.nav-question { margin:.2rem 0 .65rem; }
+.nav-question-title { color:var(--text); font-size:1.05rem; font-weight:850; }
+.nav-question-copy { color:var(--muted); font-size:.82rem; margin-top:.2rem; }
+.nav-current {
+    padding:.7rem .85rem; margin:.15rem 0 .35rem;
+    border-left:3px solid var(--accent); border-radius:0 9px 9px 0;
+    background:rgba(59,130,246,.07); color:var(--muted);
+    font-size:.82rem; line-height:1.5;
+}
+.nav-current strong { display:block; color:var(--text); font-size:.9rem; margin-bottom:.12rem; }
 .section-heading .section-title { margin:0; }
 .section-heading .section-copy { margin:.18rem 0 0; }
 [data-testid="stPlotlyChart"] { border-radius:12px; overflow:hidden; }
 [data-testid="stDataFrame"] { min-height:260px; }
 [data-testid="stDeckGlJsonChart"] { border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+.card-header .card-icon {
+    width:1.4rem; height:1.4rem; border:0; border-radius:0;
+    background:transparent; box-shadow:none;
+}
+.kpi:hover, .journey-step:hover {
+    transform:none; border-color:var(--border); box-shadow:var(--shadow-card);
+}
+.map-legend {
+    display:flex; align-items:center; gap:.65rem 1.1rem; flex-wrap:wrap;
+    padding:.65rem .8rem; margin:.1rem 0 .6rem; border-radius:10px;
+    background:rgba(255,255,255,.025); color:var(--muted); font-size:.76rem;
+}
+.map-legend strong { color:var(--text); }
+.legend-item { display:inline-flex; align-items:center; gap:.4rem; }
+.legend-dot { width:.65rem; height:.65rem; border-radius:50%; border:1px solid rgba(255,255,255,.7); }
+.legend-blue { background:#3B82F6; }
+.legend-red { background:#EF4444; }
+.legend-gray { background:#94A3B8; }
 
 /* ── RESPONSIVE ────────────────────────────────────────────── */
 @media (max-width:980px) {
@@ -627,14 +674,32 @@ hr { border-color: rgba(255,255,255,0.05) !important; }
 @media (max-width:760px) {
     .journey-grid, .kpi-grid { grid-template-columns:1fr; }
     .hero h1  { font-size:2.1rem; }
-    .hero     { padding:1.5rem 1.15rem 1.3rem; }
+    .hero     { padding:1.15rem; }
     .block-container { padding:1rem .9rem 3rem; }
     [data-testid="stHorizontalBlock"] { gap:.65rem; }
+    [data-testid="stHorizontalBlock"] { flex-wrap:wrap; }
+    [data-testid="column"] {
+        min-width:100% !important; width:100% !important; flex:1 1 100% !important;
+    }
     .hero-kpi { min-width:0; flex:1 1 140px; }
     .nav-wrap { position:relative; top:0; overflow-x:auto; }
     div[role="radiogroup"] { flex-wrap:nowrap !important; min-width:max-content; }
     .panel, .card { padding:1.1rem; border-radius:15px; }
     [data-testid="stVerticalBlockBorderWrapper"] > div { padding:1rem !important; }
+    .filter-heading { align-items:flex-start; margin-bottom:.25rem; }
+    .status-bar { gap:.45rem .7rem; padding:.7rem .8rem; }
+    .status-sep { display:none; }
+    .status-chip {
+        flex:1 1 calc(50% - .7rem); align-items:flex-start;
+        flex-direction:column; gap:.12rem;
+    }
+    [data-testid="stDeckGlJsonChart"] { min-height:420px; border-radius:12px; }
+}
+@media (max-width:420px) {
+    .block-container { padding:.75rem .65rem 2.5rem; }
+    h3 { font-size:1.25rem; }
+    .status-chip { flex-basis:100%; }
+    .result-hero { padding:1.1rem; }
 }
 </style>
 """
@@ -675,7 +740,7 @@ def render_header() -> None:
                 </div>
             </div>
             <h1><em>{APP_TITLE}</em></h1>
-            <div class='hero-sub'>{APP_SUBTITLE} {APP_DESCRIPTION}</div>
+            <div class='hero-sub'>{APP_SUBTITLE} Consulte o histórico para apoiar sua decisão.</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -696,19 +761,66 @@ def render_section_heading(icon: str, title: str, copy: str | None = None) -> No
 
 
 def render_top_nav() -> str:
-    labels = [name for name, _ in PAGES]
     if 'page' not in st.session_state:
         st.session_state.page = 'Planejar viagem'
-    page = st.radio(
-        'Navegação',
-        labels,
-        index=labels.index(st.session_state.page),
-        horizontal=True,
-        label_visibility='collapsed',
-        key='top_nav_radio',
+
+    def open_page(page_name: str) -> None:
+        st.session_state.page = page_name
+
+    st.markdown(
+        """
+        <div class='nav-question'>
+            <div class='nav-question-title'>O que você quer fazer?</div>
+            <div class='nav-question-copy'>Clique em uma opção. Para começar, escolha “Planejar minha viagem”.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    st.session_state.page = page
-    return page
+    main_options = [
+        ('Planejar viagem', '🚗 Planejar minha viagem'),
+        ('Panorama rápido', '📊 Ver resumo dos acidentes'),
+        ('Mapa histórico', '🗺️ Ver acidentes no mapa'),
+        ('Sobre', '❓ Entender como funciona'),
+    ]
+    cols = st.columns(4)
+    for col, (page_name, label) in zip(cols, main_options):
+        with col:
+            st.button(
+                label,
+                key=f"nav_{page_name}",
+                type='primary' if st.session_state.page == page_name else 'secondary',
+                use_container_width=True,
+                on_click=open_page,
+                args=(page_name,),
+            )
+
+    with st.expander('Mais opções'):
+        extra_options = [
+            ('Lugares com mais atenção', '⚠️ Ver cidades e estradas com mais atenção'),
+            ('Melhores horários', '🕐 Comparar dias e horários'),
+            ('Tabela', '📋 Ver ou baixar a tabela'),
+        ]
+        extra_cols = st.columns(3)
+        for col, (page_name, label) in zip(extra_cols, extra_options):
+            with col:
+                st.button(
+                    label,
+                    key=f"nav_{page_name}",
+                    type='primary' if st.session_state.page == page_name else 'secondary',
+                    use_container_width=True,
+                    on_click=open_page,
+                    args=(page_name,),
+                )
+
+    descriptions = dict(PAGES)
+    friendly_names = dict(main_options + extra_options)
+    current = st.session_state.page
+    st.markdown(
+        f"<div class='nav-current'><strong>Você está em: {friendly_names[current]}</strong>"
+        f"{descriptions[current]}</div>",
+        unsafe_allow_html=True,
+    )
+    return current
 
 
 def render_status_bar(total: int, source: str, counts: dict, uf_count: int) -> None:
@@ -842,20 +954,9 @@ def render_filters(
     years: list[int],
     ufs_by_source: dict[str, list[str]],
 ):
-    """Render all global filters in one cohesive, responsive panel."""
-    with st.container(border=True):
-        st.markdown(
-            """
-            <div class='filter-heading'>
-                <div class='filter-heading-icon'>⌁</div>
-                <div>
-                    <div class='filter-heading-title'>Refine sua consulta</div>
-                    <div class='filter-heading-copy'>Combine base, período e estados para atualizar todo o painel.</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    """Render compact global filters and keep the active selection visible."""
+    with st.expander('Filtros da consulta', expanded=False, icon='🔎'):
+        st.caption('Filtre os dados exibidos no painel.')
         c1, c2, c3 = st.columns([1.0, 1.25, 1.45], gap='medium')
         source = c1.selectbox(
             'Base de dados',
@@ -881,6 +982,9 @@ def render_filters(
             key='_ufs',
             placeholder='Todos os estados',
         )
+    years_label = ', '.join(map(str, selected_years)) if selected_years else 'Todos os anos'
+    ufs_label = f'{len(selected_ufs)} estado(s)' if selected_ufs else f'Todos os estados ({len(available_ufs)})'
+    st.caption(f'Consulta atual: {source} · {years_label} · {ufs_label}')
     return source, selected_years, selected_ufs, available_ufs
 
 

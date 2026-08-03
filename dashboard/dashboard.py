@@ -113,6 +113,7 @@ def _render_history_buttons() -> str | None:
                 f"{h['dest']} · {h['score']}/100",
                 key=f"hist_{i}_{h['dest']}",
                 use_container_width=True,
+                type='secondary',
             ):
                 clicked = h['dest']
     st.markdown("</div>", unsafe_allow_html=True)
@@ -134,44 +135,40 @@ def _render_trip_result(df: pd.DataFrame, destination: str, day: str, origin: st
 
     _add_to_history(str(label), score, band)
 
-    bullets = [
-        f"Destino: {label}",
-        f"Melhor horário: {human_hours(explanation['best_hours'][:2])}",
-        f"Evitar: {human_hours(explanation['worst_hours'])}",
-        f"Confiança: {str(explanation['confidence']).capitalize()} · {human_int(explanation['records'])} dados",
-    ]
-    render_result_panel(f"Nota {score}/100 — {band}", explanation['summary'], explanation['recommendation'], bullets)
-
+    has_comparison = bool(explanation['best_hours'])
+    best_time = human_hours(explanation['best_hours'][:2]) if has_comparison else 'dados insuficientes'
+    bullets = [f"Destino: {label} · {day}"]
+    if explanation['worst_hours']:
+        bullets.append(f"Horários para evitar: {human_hours(explanation['worst_hours'])}")
+    observed_hours = int(explanation['observed_hours'])
+    hour_label = 'horário' if observed_hours == 1 else 'horários'
+    bullets.append(
+        f"Base analisada: {human_int(explanation['records'])} registros em "
+        f"{human_int(observed_hours)} {hour_label}"
+    )
     if explanation['confidence'] == 'insuficiente':
-        render_mini_callout('!', 'Poucos dados', 'Resultado apenas como pista — dados insuficientes para esse filtro.')
+        recommendation = (
+            'Há poucos horários registrados para fazer uma comparação confiável. '
+            'Use este resultado apenas como referência e confirme as condições atuais no Maps.'
+        )
+    else:
+        recommendation = explanation['recommendation'].split('. ', 1)[-1]
+    render_result_panel(
+        f"Melhor horário: {best_time}" if has_comparison else 'Não há horários suficientes para comparar',
+        f"Atenção {band.lower()} · Nota {score}/100.",
+        recommendation,
+        bullets,
+    )
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        metric_card('Nota de atenção', f"{score}/100",
-                    tooltip='Escala 0–100. Quanto maior, mais cuidado vale ter nessa rota e dia.')
-    with c2:
-        metric_card('Nível', band,
-                    tooltip='Baixa / Moderada / Elevada / Alta — resumo qualitativo da nota.')
-    with c3:
-        metric_card('Melhor horário', human_hours(explanation['best_hours'][:2]),
-                    tooltip='Horários com menor score histórico de atenção para esse destino e dia.')
-    with c4:
-        metric_card('Confiança', str(explanation['confidence']).capitalize(),
-                    tooltip='Alta = 300+ casos. Moderada = 120+. Baixa = 30+. Insuficiente = menos de 30.')
-
-    col_gauge, col_tables = st.columns([0.9, 1.1])
-    with col_gauge:
-        with st.container(border=True):
+    with st.expander('Entenda o resultado e compare os horários'):
+        col_gauge, col_tables = st.columns([0.9, 1.1])
+        with col_gauge:
             render_section_heading('◎', 'Nota visual', 'Quanto maior, mais atenção o histórico sugere.')
             render_gauge(score, band)
-
-        with st.container(border=True):
             render_section_heading('i', 'Por que esse resultado')
             for reason in explanation['reasons']:
                 render_mini_callout('→', 'Fator observado', reason)
-
-    with col_tables:
-        with st.container(border=True):
+        with col_tables:
             render_section_heading('◷', 'Horários do dia', 'Compare os períodos com registros disponíveis.')
             best_tbl  = explanation['best_table'].rename(columns={'hora': 'Hora', 'acidentes': 'Casos', 'support_level': 'Base', 'score_100': 'Nota', 'faixa': 'Nível', 'driver': 'Motivo'})
             worst_tbl = explanation['worst_table'].rename(columns={'hora': 'Hora', 'acidentes': 'Casos', 'support_level': 'Base', 'score_100': 'Nota', 'faixa': 'Nível', 'driver': 'Motivo'})
@@ -201,7 +198,7 @@ def render_route_map(origin: str, destination: str) -> None:
             'Mapa da rota',
             f'Prévia de {origin.strip()} até {destination}. Confira trânsito e bloqueios antes de sair.',
         )
-        st.iframe(embed_url, height=460, scrolling=False)
+        st.iframe(embed_url, height=460)
         st.link_button(
             'Abrir rota completa no Google Maps',
             build_maps_link(origin, destination),
@@ -267,20 +264,39 @@ def page_plan_trip(df: pd.DataFrame, source: str) -> None:
             render_mini_callout('i', 'Quase lá', 'Preencha os dois destinos para ver a comparação.')
         return
 
-    c1, c2, c3 = st.columns([1.15, 1.15, 0.7])
-    origin      = c1.text_input('Origem',      placeholder='Ex.: São Paulo, SP')
-    default_dest = hist_click or ''
-    destination = c2.text_input('Destino', placeholder='Ex.: Santos, SP', value=default_dest)
-    day         = c3.selectbox('Dia da semana', DAY_OPTIONS, index=4)
+    with st.container(border=True):
+        render_section_heading('⌖', 'Dados da viagem', 'Informe o destino e escolha o dia para consultar o histórico.')
+        c1, c2, c3 = st.columns([1.15, 1.15, 0.7])
+        origin      = c1.text_input('Origem (opcional)', placeholder='Ex.: São Paulo, SP')
+        default_dest = hist_click or st.session_state.get('_trip_destination', '')
+        destination = c2.text_input('Destino', placeholder='Ex.: Santos, SP', value=default_dest)
+        day         = c3.selectbox('Dia da semana', DAY_OPTIONS, index=4)
+        calculate = st.button('Calcular melhor horário', type='primary', use_container_width=True)
 
-    if not destination:
+    if calculate:
+        if destination.strip():
+            st.session_state['_trip_query'] = {
+                'origin': origin.strip(), 'destination': destination.strip(), 'day': day,
+            }
+            st.session_state['_trip_destination'] = destination.strip()
+        else:
+            st.warning('Digite um destino para calcular o melhor horário.')
+
+    if hist_click:
+        st.session_state['_trip_query'] = {
+            'origin': origin.strip(), 'destination': hist_click, 'day': day,
+        }
+
+    query = st.session_state.get('_trip_query')
+    if not query:
         render_journey()
-        render_mini_callout('i', 'Comece pelo destino', 'O sistema usa dados históricos para dar uma dica de horário.')
         return
 
-    _render_trip_result(df, destination, day, origin=origin)
+    _render_trip_result(
+        df, query['destination'], query['day'], origin=query.get('origin', '')
+    )
 
-    if not origin:
+    if not query.get('origin'):
         render_mini_callout('→', 'Próximo passo', 'Digite a origem para abrir a rota no Google Maps.')
 
 
@@ -447,35 +463,93 @@ def page_best_hours(df: pd.DataFrame) -> None:
 
 def page_map(df: pd.DataFrame) -> None:
     st.markdown("<h3>Mapa dos registros</h3>", unsafe_allow_html=True)
-    geo = df.dropna(subset=['latitude', 'longitude'])[['latitude', 'longitude', 'municipio', 'uf', 'acidente_grave']].copy()
+    geo = df.dropna(subset=['latitude', 'longitude'])[
+        ['latitude', 'longitude', 'municipio', 'uf', 'acidente_grave']
+    ].copy()
+    # Remove coordenadas incompatíveis com a malha rodoviária brasileira.
+    # Esses registros continuam na base e nas métricas, mas não são desenhados
+    # no mapa para evitar pontos espúrios no oceano ou em outros continentes.
+    geo = geo[
+        geo['latitude'].between(-34.0, 6.0)
+        & geo['longitude'].between(-74.0, -34.0)
+    ].copy()
     if geo.empty:
         st.warning('Não há pontos no mapa para esse filtro.')
         return
-    if len(geo) > 12000:
+    available_points = len(geo)
+    if available_points > 12000:
         geo = geo.sample(12000, random_state=42)
+    displayed_points = len(geo)
 
-    render_result_panel(
-        'Mapa histórico de registros',
-        'O mapa mostra onde há mais registros nos dados. Serve para entender a região, não para guiar a viagem.',
-        'Para escolher a hora de sair, use Planejar viagem.',
-        ['O mapa não substitui GPS nem informações em tempo real.'],
+    st.markdown(
+        f"""
+        <div class='map-legend'>
+            <strong>{displayed_points:,} de {available_points:,} registros exibidos</strong>
+            <span class='legend-item'><span class='legend-dot legend-red'></span>Ponto de acidente</span>
+            <span>Aproxime o mapa para separar os pontos</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     try:
         import pydeck as pdk
-        layer = pdk.Layer(
+        severity = pd.to_numeric(geo['acidente_grave'], errors='coerce')
+        geo['categoria'] = severity.map(
+            {1: 'Acidente grave', 0: 'Acidente sem vítima grave'}
+        ).fillna('Gravidade não informada')
+        geo['cor'] = [[239, 68, 68, 255] for _ in range(len(geo))]
+        geo['titulo'] = geo['municipio'].fillna('Local não informado') + ', ' + geo['uf'].fillna('')
+        lat_span = float(geo['latitude'].max() - geo['latitude'].min())
+        lon_span = float(geo['longitude'].max() - geo['longitude'].min())
+        span = max(lat_span, lon_span)
+        zoom = 4.1 if span > 25 else 4.8 if span > 10 else 5.8 if span > 4 else 7.2 if span > 1.5 else 9
+        is_national_view = span > 25
+        view = pdk.ViewState(
+            latitude=-14.2 if is_national_view else float(geo['latitude'].median()),
+            longitude=-51.9 if is_national_view else float(geo['longitude'].median()),
+            zoom=zoom,
+            pitch=0,
+        )
+        layers = [pdk.Layer(
             'ScatterplotLayer', data=geo,
             get_position='[longitude, latitude]',
-            get_color='[59, 130, 246, 140]',
-            get_radius=1800, pickable=True, auto_highlight=True,
-        )
-        view  = pdk.ViewState(latitude=-15.8, longitude=-47.9, zoom=4, pitch=0)
+            get_fill_color='cor',
+            get_line_color='[255, 255, 255, 210]',
+            get_radius=80,
+            radius_units='meters',
+            radius_min_pixels=.45,
+            radius_max_pixels=4,
+            stroked=False,
+            pickable=True,
+            auto_highlight=True,
+            opacity=1,
+        )]
         deck  = pdk.Deck(
-            layers=[layer], initial_view_state=view,
+            layers=layers, initial_view_state=view,
             map_style='https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-            tooltip={'text': '{municipio}, {uf}'},
+            tooltip={
+                'html': (
+                    '<div><div style="color:#94A3B8;font-size:10px;font-weight:800;'
+                    'letter-spacing:.08em;margin-bottom:5px">LOCAL DO REGISTRO</div>'
+                    '<div style="color:#F8FAFC;font-size:14px;font-weight:800">'
+                    '{titulo}</div>'
+                    '<div style="color:#CBD5E1;font-size:12px;margin-top:5px">'
+                    '{categoria}</div></div>'
+                ),
+                'style': {
+                    'backgroundColor': '#111827',
+                    'color': '#E5E7EB',
+                    'border': '1px solid rgba(148, 163, 184, .3)',
+                    'borderRadius': '10px',
+                    'padding': '12px 14px',
+                    'fontFamily': 'Inter, sans-serif',
+                    'fontSize': '13px',
+                    'boxShadow': '0 10px 30px rgba(0, 0, 0, .45)',
+                },
+            },
         )
-        st.pydeck_chart(deck, use_container_width=True)
+        st.pydeck_chart(deck, width='stretch', height=520)
     except Exception:
         st.map(geo[['latitude', 'longitude']], use_container_width=True)
 
